@@ -5,6 +5,7 @@
 // ****************************************************
 
 const express = require("express");
+const mongo = require("mongoose");
 
 // ****************************************************
 // *
@@ -14,8 +15,12 @@ const express = require("express");
 
 const config = require("config");
 const app = express();
+const router = express.Router();
+
+const userRoutes = require("./routes/user.routes");
 
 const port = config.get("port");
+const url = config.get("db_url");
 
 // ****************************************************
 // *
@@ -31,6 +36,14 @@ app.use(express.json());
 // *
 // ****************************************************
 
+mongo.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
+    .catch(err => console.log(err));
+
+const connection = mongo.connection;
+
+connection.once("open", () => {
+    console.log("Database connected!");
+});
 
 // ****************************************************
 // *
@@ -38,9 +51,9 @@ app.use(express.json());
 // *
 // ****************************************************
 
-app.get("/", (req, res) => {
-	res.send("Hello World!");
-});
+router.use("/user", userRoutes);
+
+app.use(config.get("root"), router);
 
 // ****************************************************
 // *
