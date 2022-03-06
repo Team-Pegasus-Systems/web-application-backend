@@ -149,7 +149,7 @@ const create = async (req, res) => {
 				{ expiresIn: 3600 }
 			);
 			res.json({
-				status: "successful",
+				status: "success",
 				token: token,
 			});
 		})
@@ -172,7 +172,7 @@ const signIn = async (req, res) => {
 					{ expiresIn: 3600 }
 				);
 				res.json({
-					status: "successful",
+					status: "success",
 					token: token,
 				});
 			} else {
@@ -233,4 +233,4 @@ const invalidCheck = (body) => {
 	}
 };
 
-module.exports = { getAll, getById, create, auth, checkAvailability };
+module.exports = { getAll, getById, create, auth, signIn, checkAvailability };

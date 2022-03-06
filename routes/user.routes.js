@@ -5,12 +5,14 @@ const upload = require("../Middleware/image.middleware").upload;
 
 router.route("/").get(controller.getAll);
 
-router.route("/availability").get(controller.checkAvailability);
-
 router.route("/:id").get(controller.getById);
 
 router.route("/").post(upload.single("image"),controller.create);
 
 router.route("/auth").post(auth, controller.auth);
+
+router.route("/availability").post(controller.checkAvailability);
+
+router.route("/signIn").post(controller.signIn);
 
 module.exports = router;
