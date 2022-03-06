@@ -6,6 +6,7 @@
 
 const express = require("express");
 const mongo = require("mongoose");
+const cors = require("cors");
 
 // ****************************************************
 // *
@@ -29,6 +30,7 @@ const url = config.get("db_url");
 // ****************************************************
 
 app.use(express.json());
+app.use(cors());
 
 // ****************************************************
 // *
@@ -52,6 +54,7 @@ connection.once("open", () => {
 // ****************************************************
 
 router.use("/user", userRoutes);
+router.use("/static/profile-pictures", express.static('./public/profile_pictures'));
 
 app.use(config.get("root"), router);
 
