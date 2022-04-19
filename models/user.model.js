@@ -85,11 +85,11 @@ const User = mongo.Schema({
     },
     role: {
         type: String,
-        enum: ['USER', 'ADMIN', 'EXT_DEV', 'MODERATOR']
+        enum: ['USER', 'ADMIN', 'DEV', 'TESTER', "PROJECT_MANAGER"]
     },
     profileImage: {
         type: String
     }
-})
+});
 
 module.exports = mongo.model("users", User);

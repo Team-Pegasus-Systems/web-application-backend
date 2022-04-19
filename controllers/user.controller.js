@@ -14,7 +14,7 @@ const getAll = async (req, res) => {
 			});
 		})
 		.catch((err) => {
-			res.json({
+			res.status(400).json({
 				status: "error",
 				result: err,
 			});
@@ -23,16 +23,23 @@ const getAll = async (req, res) => {
 
 const getById = async (req, res) => {
 	await user
-		.find({ _id: req.params.id })
+		.findOne({ _id: req.params.id })
 		.select("-password")
 		.then((result) => {
-			res.json({
-				status: "success",
-				result: result,
-			});
+			if (result) {
+				res.json({
+					status: "success",
+					result: result,
+				});
+			} else {
+				res.json({
+					status: "fail",
+					result: "No users found",
+				});
+			}
 		})
 		.catch((err) => {
-			res.json({
+			res.status(400).json({
 				status: "error",
 				result: err,
 			});
@@ -50,7 +57,7 @@ const auth = async (req, res) => {
 			});
 		})
 		.catch((err) => {
-			res.json({
+			res.status(400).json({
 				status: "error",
 				result: err,
 			});
@@ -144,7 +151,7 @@ const create = async (req, res) => {
 		})
 		.then((result) => {
 			const token = jwt.sign(
-				{ user: { id: result._id, role: result.role } },
+				{ id: result._id, role: result.role },
 				config.get("jwtsecret"),
 				{ expiresIn: 3600 }
 			);
@@ -153,10 +160,10 @@ const create = async (req, res) => {
 				token: token,
 			});
 		})
-		.catch((result) => {
-			res.json({
+		.catch((err) => {
+			res.status(400).json({
 				status: "error",
-				result: result,
+				result: err,
 			});
 		});
 };
@@ -167,7 +174,7 @@ const signIn = async (req, res) => {
 		.then((result) => {
 			if (bcrypt.compareSync(req.body.password, result.password)) {
 				const token = jwt.sign(
-					{ user: { id: result._id, role: result.role } },
+					{ id: result._id, role: result.role },
 					config.get("jwtsecret"),
 					{ expiresIn: 3600 }
 				);
@@ -179,10 +186,10 @@ const signIn = async (req, res) => {
 				throw Error("Password mismatch");
 			}
 		})
-		.catch((result) => {
-			res.json({
+		.catch((err) => {
+			res.status(400).json({
 				status: "error",
-				result: result,
+				result: err,
 			});
 		});
 };
@@ -204,10 +211,10 @@ const checkAvailability = async (req, res) => {
 				});
 			}
 		})
-		.catch((error) => {
-			res.json({
+		.catch((err) => {
+			res.status(400).json({
 				status: "error",
-				result: "error",
+				result: err,
 			});
 		});
 };
@@ -229,6 +236,45 @@ const invalidCheck = (body) => {
 		res.json({
 			status: "unsuccess",
 			result: "Invalid request body",
+		});
+	}
+};
+
+const update = async (req, res) => {
+	await user.findOneAndDelete({_id: req.body.id })
+		.then(result => {
+			res.json({
+				status: "success",
+				result: "email is available to use",
+			})
+		})
+		.catch((err) => {
+			res.status(400).json({
+				status: "error",
+				result: err,
+			});
+		});
+};
+
+const deleteById = async (req, res) => {
+	if (req.user.role === "ADMIN") {
+		await user.findOneAndDelete({_id: req.body.id })
+		.then(result => {
+			res.json({
+				status: "success",
+				result: "Account deleted successfully",
+			})
+		})
+		.catch((err) => {
+			res.status(400).json({
+				status: "error",
+				result: err,
+			});
+		});
+	} else {
+		res.json({
+			status: "error",
+			result: "Authentication failed"
 		});
 	}
 };
